@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unsaid Thoughts</title>
+    <style>
+        /* Base Setup */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url("C:/Users/Mark Nathan/OneDrive/Desktop/assets/360_F_982804926_AJhXonTdUGoL60TU0tJgbFlZ4gMUE0D2.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 20px;
+            overflow: hidden; 
+        }
+
+        /* CAUTION OVERLAY - VIGNETTE STYLE */
+        #caution-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Radial gradient creates the vignette effect */
+            background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000;
+            transition: opacity 1.2s ease, visibility 1.2s;
+        }
+
+        .caution-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            transform: scale(1);
+            transition: transform 0.5s ease;
+        }
+
+        .caution-container h2 {
+            font-size: 0.8rem;
+            letter-spacing: 6px;
+            color: rgba(255, 80, 80, 0.8);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .caution-container p {
+            font-size: 1.2rem;
+            margin-bottom: 35px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .proceed-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+        }
+
+        .proceed-btn:hover {
+            background: #fff;
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
+        }
+
+        .hidden-overlay { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* Particle Canvas Layer */
+        #particleCanvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Container */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-box {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-box h1 {
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .home-link {
+            display: inline-block;
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .home-link:hover { color: #fff; border-bottom: 1px solid #fff; }
+
+        /* SCROLLBAR AREA */
+        .list-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 15px;
+        }
+
+        .list-container::-webkit-scrollbar { width: 5px; }
+        .list-container::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .list-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        /* List Items */
+        .list-item {
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .list-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .item-header {
+            padding: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-header span:first-child {
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .toggle-icon {
+            font-size: 1rem;
+            opacity: 0.5;
+            transition: transform 0.4s ease;
+        }
+
+        .list-item.active { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.4); }
+        .list-item.active .toggle-icon { transform: rotate(180deg); opacity: 1; }
+
+        .item-content {
+            padding: 0 1.2rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .list-item.active .item-content {
+            padding: 0 1.2rem 1.5rem;
+            max-height: 500px;
+        }
+
+        #bgVideo { position: fixed; top: -1000px; visibility: hidden; }
+    </style>
+</head>
+<body>
+
+    <div id="caution-overlay">
+        <div class="caution-container">
+            <h2>CAUTION</h2>
+            <p>this might hurt you.</p>
+            <button class="proceed-btn" onclick="startExperience()">theres no love when theres no pain, proceed</button>
+        </div>
+    </div>
+
+    <canvas id="particleCanvas"></canvas>
+
+    <video id="bgVideo" loop>
+        <source src="C:\Users\Mark Nathan\OneDrive\Desktop\assets\Download (1).mp4" type="video/mp4">
+    </video>
+
+    <div class="main-container">
+        <div class="header-box">
+            <h1>unsaid thoughts</h1>
+            <a href="dekstop.html" class="home-link">Return to Home</a>
+        </div>
+
+        <div class="list-container" id="mainList">
+            <div class="list-item">
+                <div class="item-header"><span>Thing #1</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate it when you spent more times with your boy best friends than your time spent with me, I hate that feeling, kapag nagiging mas matimbang na sila sakin, well it's unavoidable and kasalanan ko rin siguro kapag nangyayari yon, but still, masaet sya.</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #2</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate it kapag nagiging second option ako, like nagiging sakin kalang kapag wala sila.</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #3</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate it when you're being careless with your words, seryoso man o as a joke, especially yung "I don't care, normal lang yon" nung nag selos ako kay KD, well I understand na normal lang yon sainyo ng mga kaibigan mo, nakakaselos sya, sobra, but that's you, I need to accept that kahit masakit keribels ko yan, but for KD, damn ex crush mo yan, lugi. Masaet yon, naging touchy and clingy ka sa ex crush mo, nag selos ako, sagot mo "I don't care" agay.</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #4</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love comparing my self sa mga boy best friends mo, example, yung kay KD, apaka close niyong dalawa samantalang sakin di ka man lang makalapit tapos nilalayuan mo pa</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #5</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate it kapag ginagawa ng ibang lalaki mga bagay na ako dapat gumagawa, like carrying your things, etc, well tamad ako, but for my girl, gustong gusto ko gawin eon</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #6</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love doing boyfriend duties kahit wala ako girlfriend</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #7</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love it kapag pinagmamayabang ako, hindi yung mukha, ayaw na ayaw ko yan, I mean the efforts, feel ko mali yung term na pinagmamayabang, basta kapag fineflex yung effort ganon, for me, efforts getting flexed is another level of appreciation</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #8</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love it when my girl knows how to make the first move</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #9</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love it when my girl remember small things about me</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #10</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate one thing about me, may bad habit kasi ako na nawawalan ako ng pake sa lahat kapag attached na attached ako sa ginagawa ko, like sarap na sarap ako sa kinakain ko, or super chill na'ko habang nanunuod, etc. pero it doesnt mean na ini-ignore ko na yung ibang bagay hihi</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #11</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate my mood swing, like napaka hyper ko lang kanina tapos biglang di na'ko namamansin tapos napipikon ako kapag may kumakausap sakin</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #12</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate it kapag biglang bumabalik mga unsaid thoughts ko kaya bigla akong natutulala na para bang napaka lalim ng iniisip ko, and that's the purpose of this, to express my unsaid thoughts, and para sabihin yung mga bagay na hate ko, di ko na keri tiisin eh hihihi</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #13</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I prefer deep talks than kiss and hugs</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #14</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I hate backstabbers, like why pa need na pagusapan patago pwede namang harap harapan, like anong point kung itatago</div>
+            </div>
+            <div class="list-item">
+                <div class="item-header"><span>Thing #15</span><span class="toggle-icon">▼</span></div>
+                <div class="item-content">I love it when people have integrity</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bgVideo = document.getElementById('bgVideo');
+        const overlay = document.getElementById('caution-overlay');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function startExperience() {
+            bgVideo.volume = 0.3;
+            bgVideo.play().catch(e => console.log("Play interrupted"));
+            overlay.classList.add('hidden-overlay');
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // --- Particle System ---
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 100; i++) { particles.push(new Particle()); }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        initParticles();
+        animate();
+
+        // --- Feedback Sound ---
+        function playFeedback(isOpening) {
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(isOpening ? 400 : 200, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        const listItems = document.querySelectorAll('.list-item');
+        listItems.forEach(item => {
+            item.querySelector('.item-header').addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                listItems.forEach(el => el.classList.remove('active'));
+                if (!isActive) {
+                    item.classList.add('active');
+                    playFeedback(true);
+                } else {
+                    playFeedback(false);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
