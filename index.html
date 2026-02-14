@@ -15,7 +15,8 @@
 
         body {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                        url("C:/Users/Mark Nathan/OneDrive/Desktop/assets/360_F_982804926_AJhXonTdUGoL60TU0tJgbFlZ4gMUE0D2.jpg");
+                        /* UPDATED: Path to the background image in your repository */
+                        url("360_F_982804926_AJhXonTdUGoL60TU0tJgbFlZ4gMUE0D2.jpg");
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -32,7 +33,6 @@
         #caution-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Radial gradient creates the vignette effect */
             background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -95,7 +95,6 @@
 
         .hidden-overlay { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* Particle Canvas Layer */
         #particleCanvas {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -103,7 +102,6 @@
             pointer-events: none;
         }
 
-        /* Glassmorphism Container */
         .main-container {
             position: relative;
             z-index: 1;
@@ -145,7 +143,6 @@
 
         .home-link:hover { color: #fff; border-bottom: 1px solid #fff; }
 
-        /* SCROLLBAR AREA */
         .list-container {
             max-height: 500px;
             overflow-y: auto;
@@ -159,7 +156,6 @@
             border-radius: 10px;
         }
 
-        /* List Items */
         .list-item {
             background: rgba(255, 255, 255, 0.05);
             margin-bottom: 15px;
@@ -228,13 +224,13 @@
     <canvas id="particleCanvas"></canvas>
 
     <video id="bgVideo" loop>
-        <source src="C:\Users\Mark Nathan\OneDrive\Desktop\assets\Download (1).mp4" type="video/mp4">
+        <source src="Download (1).mp4" type="video/mp4">
     </video>
 
     <div class="main-container">
         <div class="header-box">
             <h1>unsaid thoughts</h1>
-            <a href="dekstop.html" class="home-link">Return to Home</a>
+            <a href="index.html" class="home-link">Return to Home</a>
         </div>
 
         <div class="list-container" id="mainList">
@@ -365,6 +361,7 @@
 
         // --- Feedback Sound ---
         function playFeedback(isOpening) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
             osc.connect(g); g.connect(audioCtx.destination);
